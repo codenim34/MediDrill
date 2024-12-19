@@ -9,12 +9,16 @@ import { CornerDownLeft, Loader2, TextSearch, Send } from 'lucide-react';
 import Markdown from './markdown';
 
 type Props = {
-  reportData: string
+  reportData: string;
+};
+
+interface ChatResponse {
+  retrievals?: string;
 }
 
 const ChatComponent = ({ reportData }: Props) => {
   const { messages, input, handleInputChange, handleSubmit, isLoading, data } =
-    useChat({
+    useChat<ChatResponse>({
       api: "api/medichatgemini",
     });
 
