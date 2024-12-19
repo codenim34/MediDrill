@@ -1,26 +1,35 @@
-import React from 'react'
 import { useChat } from "ai/react";
 import { Badge } from "./ui/badge";
 import Messages from "./messages";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { CornerDownLeft, Loader2, TextSearch, Send } from 'lucide-react';
+import { Send } from "lucide-react";
 import Markdown from './markdown';
 
 type Props = {
   reportData: string;
 };
 
-interface ChatResponse {
+interface ChatMessage {
+  content: string;
+  role: 'user' | 'assistant';
+  id: string;
+  createdAt?: Date;
+}
+
+interface ChatData {
+  messages: ChatMessage[];
   retrievals?: string;
 }
 
 const ChatComponent = ({ reportData }: Props) => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, data } =
-    useChat<ChatResponse>({
-      api: "api/medichatgemini",
-    });
+  const { messages, input, handleInputChange, handleSubmit, isLoading, data } = useChat<ChatData>({
+    api: "api/medichatgemini",
+    onResponse: (response) => {
+      // Handle response if needed
+    },
+  });
 
   return (
     <div className="relative flex h-[calc(100vh-8rem)] flex-col space-y-4">
@@ -82,7 +91,7 @@ const ChatComponent = ({ reportData }: Props) => {
         </form>
       </div>
 
-      {data?.retrievals && (
+      {data && data.retrievals && (
         <Accordion type="single" className="text-sm" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger className="text-xs text-muted-foreground">View Related Clinical Findings</AccordionTrigger>
@@ -96,4 +105,4 @@ const ChatComponent = ({ reportData }: Props) => {
   );
 };
 
-export default ChatComponent
+export default ChatComponent;

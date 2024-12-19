@@ -29,17 +29,14 @@ const model = google('models/gemini-1.5-pro-latest', {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
     try {
-        const reqBody = await req.json();
-        console.log(reqBody);
+        const { messages, data } = await req.json();
+        const reportData = data?.reportData || "";
+        const userQuestion = messages[messages.length - 1].content;
 
-        const messages: Message[] = reqBody.messages;
-        const userQuestion = `${messages[messages.length - 1].content}`;
-
-        const reportData: string = reqBody.data.reportData;
+        // Get relevant clinical findings
         const query = `Represent this for searching relevant passages: patient medical report says: \n${reportData}. \n\n${userQuestion}`;
-
         const retrievals = await queryPineconeVectorStore(pinecone, 'index-one', "ns1", query);
 
         const prompt = `You are a medical AI assistant that can communicate in both Bengali and English. If the user's query is in Bengali, respond in Bengali. If it's in English, respond in English.
@@ -61,29 +58,22 @@ export async function POST(req: Request, res: Response) {
         \n\n**end of generic clinical findings** 
 
         \n\nProvide thorough justification for your answer. If the user's query was in Bengali, provide the response in Bengali with proper Bengali medical terminology where applicable.
-        \n\n**Answer:**
-        `;
+        \n\n**Answer:**`;
 
         const llm = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await llm.generateContent([prompt]);
+        const response = await result.response.text();
 
-        const response = await llm.generateContentStream([prompt]);
-        const stream = GoogleGenerativeAIStream(response, {
-            onStart: async () => {
-                // You can use this to track usage or other events
-            },
-            onToken: async (token: string) => {
-                // You can use this to track tokens or other events
-            },
-            onCompletion: async (completion: string) => {
-                // Get relevant clinical findings or context
-                const clinicalContext = await getClinicalContext(completion, reportData);
-                return {
-                    retrievals: clinicalContext
-                };
-            },
-        });
-
-        return new StreamingTextResponse(stream);
+        // Return both the response and retrievals
+        return new Response(JSON.stringify({
+            messages: [{
+                content: response,
+                role: 'assistant',
+                id: Date.now().toString(),
+                createdAt: new Date()
+            }],
+            retrievals: retrievals
+        }));
     } catch (error) {
         console.error("Error in chat:", error);
         return new Response("Error processing your request", { status: 500 });
