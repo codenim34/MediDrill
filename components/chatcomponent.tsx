@@ -11,23 +11,11 @@ type Props = {
   reportData: string;
 };
 
-interface ChatMessage {
-  content: string;
-  role: 'user' | 'assistant';
-  id: string;
-  createdAt?: Date;
-}
-
-interface ChatData {
-  messages: ChatMessage[];
-  retrievals?: string;
-}
-
 const ChatComponent = ({ reportData }: Props) => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, data } = useChat<ChatData>({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, data } = useChat({
     api: "api/medichatgemini",
-    onResponse: (response) => {
-      // Handle response if needed
+    body: {
+      reportData: reportData,
     },
   });
 
@@ -59,14 +47,7 @@ const ChatComponent = ({ reportData }: Props) => {
 
       <div className="sticky bottom-0 bg-gradient-to-t from-background from-50% pt-6">
         <form 
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmit(event, {
-              data: {
-                reportData: reportData,
-              },
-            });
-          }} 
+          onSubmit={handleSubmit} 
           className="flex gap-2"
         >
           <Textarea
@@ -91,7 +72,7 @@ const ChatComponent = ({ reportData }: Props) => {
         </form>
       </div>
 
-      {data && data.retrievals && (
+      {data?.retrievals && (
         <Accordion type="single" className="text-sm" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger className="text-xs text-muted-foreground">View Related Clinical Findings</AccordionTrigger>
