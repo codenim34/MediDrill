@@ -1,11 +1,11 @@
-import React, { ChangeEvent, useState } from 'react'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
-import { Textarea } from './ui/textarea'
-import { Label } from './ui/label'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { ChangeEvent, useState } from "react"
 import SocialMediaLinks from './social-links'
-// import { toast } from 'sonner'
 import { useToast } from "@/components/ui/use-toast"
+import { FileText, Upload } from "lucide-react"
 
 type Props = {
     onReportConfirmation: (data: string) => void
@@ -147,41 +147,56 @@ const ReportComponent = ({ onReportConfirmation }: Props) => {
     return (
         // <div className="grid w-full items-start gap-6">
         <div className="grid w-full items-start gap-6 overflow-auto p-4 pt-0">
-            <fieldset className='relative grid gap-6 rounded-lg border p-4'>
-                <legend className="text-sm font-medium">Report</legend>
-                {isLoading && (
-                    <div
-                        className={"absolute z-10 h-full w-full bg-card/90 rounded-lg flex flex-row items-center justify-center"
-                        }
-                    >
-                        extracting...
+            <fieldset className='relative space-y-4 rounded-lg border p-4'>
+                <legend className="text-sm font-medium">Upload Medical Report</legend>
+
+                <div className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-6 text-center">
+                    <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Upload className="size-6 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                        <h3 className="text-sm font-medium">Upload your report</h3>
+                        <p className="text-xs text-muted-foreground">
+                            Support for JPG, PNG, and PDF files
+                        </p>
+                    </div>
+                    <input
+                        type="file"
+                        onChange={handleReportSelection}
+                        className="w-full cursor-pointer opacity-0 absolute inset-0"
+                        accept=".jpg,.jpeg,.png,.pdf"
+                    />
+                </div>
+
+                {base64Data && (
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 rounded-lg border bg-card p-2">
+                            <div className="size-10 rounded bg-primary/10 flex items-center justify-center">
+                                <FileText className="size-5 text-primary" />
+                            </div>
+                            <div className="flex-1 truncate text-sm">Report uploaded</div>
+                            <Button
+                                onClick={extractDetails}
+                                disabled={isLoading}
+                                size="sm"
+                                className="ml-auto"
+                            >
+                                {isLoading ? (
+                                    <div className="size-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
+                                ) : (
+                                    "Process"
+                                )}
+                            </Button>
+                        </div>
+
+                        {reportData && (
+                            <div className="rounded-lg border bg-card p-4">
+                                <h4 className="mb-2 text-sm font-medium">Report Summary</h4>
+                                <p className="text-sm text-muted-foreground">{reportData}</p>
+                            </div>
+                        )}
                     </div>
                 )}
-                <Input type='file'
-                    // accept='image/*' 
-                    onChange={handleReportSelection} />
-                <Button onClick={extractDetails}>1. Upload File</Button>
-                <Label>Report Summary</Label>
-                <Textarea
-                    value={reportData}
-                    onChange={(e) => {
-                        setReportData(e.target.value);
-                    }}
-                    placeholder="Extracted data from the report will appear here. Get better recommendations by providing additional patient history and symptoms..."
-                    className="min-h-72 resize-none border-0 p-3 shadow-none focus-visible:ring-0" />
-                <Button
-                    variant="destructive"
-                    className="bg-[#D90013]"
-                    onClick={() => {
-                        onReportConfirmation(reportData);
-                    }}
-                >
-                    2. Looks Good
-                </Button>
-                <div className='flex flex-row items-center justify-center gap-2 p-4'>
-                    <Label>Share your thoughts </Label>
-                    <SocialMediaLinks />
-                </div>
             </fieldset>
         </div>
     )

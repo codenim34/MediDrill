@@ -35,27 +35,29 @@ export async function POST(req: Request, res: Response) {
     const reportData: string = reqBody.data.reportData;
     const query = `Represent this for searching relevant passages: patient medical report says: \n${reportData}. \n\n${userQuestion}`;
 
-    const retrievals = await queryPineconeVectorStore(pinecone, 'medic', "ns1", query);
+    const retrievals = await queryPineconeVectorStore(pinecone, 'index-one', "ns1", query);
 
-    const finalPrompt = `Here is a summary of a patient's clinical report, and a user query. Some generic clinical findings are also provided that may or may not be relevant for the report.
-  Go through the clinical report and answer the user query.
-  Ensure the response is factually accurate, and demonstrates a thorough understanding of the query topic and the clinical report.
-  Before answering you may enrich your knowledge by going through the provided clinical findings. 
-  The clinical findings are generic insights and not part of the patient's medical report. Do not include any clinical finding if it is not relevant for the patient's case.
+    const finalPrompt = `You are a medical AI assistant that can communicate in both Bengali and English. If the user's query is in Bengali, respond in Bengali. If it's in English, respond in English.
 
-  \n\n**Patient's Clinical report summary:** \n${reportData}. 
-  \n**end of patient's clinical report** 
+    Here is a summary of a patient's clinical report, and a user query. Some generic clinical findings are also provided that may or may not be relevant for the report.
+    Go through the clinical report and answer the user query.
+    Ensure the response is factually accurate, and demonstrates a thorough understanding of the query topic and the clinical report.
+    Before answering you may enrich your knowledge by going through the provided clinical findings. 
+    The clinical findings are generic insights and not part of the patient's medical report. Do not include any clinical finding if it is not relevant for the patient's case.
 
-  \n\n**User Query:**\n${userQuestion}?
-  \n**end of user query** 
+    \n\n**Patient's Clinical report summary:** \n${reportData}. 
+    \n**end of patient's clinical report** 
 
-  \n\n**Generic Clinical findings:**
-  \n\n${retrievals}. 
-  \n\n**end of generic clinical findings** 
+    \n\n**User Query:**\n${userQuestion}?
+    \n**end of user query** 
 
-  \n\nProvide thorough justification for your answer.
-  \n\n**Answer:**
-  `;
+    \n\n**Generic Clinical findings:**
+    \n\n${retrievals}. 
+    \n\n**end of generic clinical findings** 
+
+    \n\nProvide thorough justification for your answer. If the user's query was in Bengali, provide the response in Bengali with proper Bengali medical terminology where applicable.
+    \n\n**Answer:**
+    `;
 
     const data = new StreamData();
     data.append({
@@ -72,4 +74,3 @@ export async function POST(req: Request, res: Response) {
 
     return result.toDataStreamResponse({ data });
 }
-

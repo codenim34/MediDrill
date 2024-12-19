@@ -1,57 +1,5 @@
-// import {
-//   ChevronLeft,
-//   ChevronRight,
-//   Copy,
-//   CreditCard,
-//   MoreVertical,
-//   Truck,
-// } from "lucide-react";
-
-// import { Button } from "@/components/ui/button";
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuSeparator,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-// import { Separator } from "@/components/ui/separator";
-// import Markdown from "./markdown";
-
-// type Props = {
-//   role?: string;
-//   content?: string;
-// };
-// const MessageBox = ({ role, content }: Props) => {
-//   return (
-//     <Card className="overflow-hidden">
-//       <CardContent className="p-6 text-sm">
-//         <Markdown text={content as string} />
-//       </CardContent>
-//       {role !== "user" && (
-//         <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
-//           <div className="text-xs text-muted-foreground">
-//             <span>Disclaimer:</span> The medical advice and recommendations provided by this
-//             application are for informational purposes only and should not
-//             replace professional medical diagnosis, treatment, or advice.
-//           </div>
-//         </CardFooter>
-//       )}
-//     </Card>
-//   );
-// };
-// export default MessageBox;
-
 import React from 'react'
-import { Card, CardContent, CardFooter } from './ui/card'
+import { cn } from '@/lib/utils'
 import Markdown from './markdown'
 
 type Props = {
@@ -61,20 +9,29 @@ type Props = {
 
 const MessageBox = ({ role, content }: Props) => {
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6 text-sm">
-        {/* {content} */}
-        <Markdown text={content} />
-      </CardContent>
+    <div className={cn(
+      "group relative mb-4 flex items-start gap-4 px-4",
+      role === "user" ? "flex-row-reverse" : ""
+    )}>
+      <div className={cn(
+        "size-8 rounded-lg flex items-center justify-center text-white",
+        role === "user" ? "bg-primary" : "bg-secondary"
+      )}>
+        {role === "user" ? "👤" : "🤖"}
+      </div>
+      <div className={cn(
+        "flex-1 space-y-4 overflow-hidden rounded-2xl px-4 py-3 transition-colors",
+        role === "user" ? "bg-primary/10" : "bg-secondary/10"
+      )}>
+        <div className="prose prose-sm dark:prose-invert max-w-none font-bengali">
+          <Markdown text={content} />
+        </div>
+      </div>
       {role !== "user" && (
-        <CardFooter className="border-t bg-muted/50 px-6 py-3 text-xs text-muted-foreground">
-          Disclaimer: The medical advice and recommendations provided by this
-          application are for informational purposes only and should not
-          replace professional medical diagnosis, treatment, or advice.
-        </CardFooter>
+        <div className="absolute bottom-0 left-12 right-4 h-px bg-border/50 transition-opacity group-hover:opacity-0" />
       )}
-    </Card>
-  )
-}
+    </div>
+  );
+};
 
 export default MessageBox

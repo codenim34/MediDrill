@@ -34,40 +34,42 @@ const Home = () => {
   }
 
   return (
-    <div className="grid h-screen w-full">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       <div className="flex flex-col">
-        <header className="sticky top-0 z-10 flex h-[57px] bg-background items-center gap-1 border-b px-4">
-          <h1 className="text-xl font-semibold text-[#D90013]">
-            <span className="flex flex-row">Mr.AlmostMD</span>
-          </h1>
-          <div className="w-full flex flex-row justify-end gap-2">
-            <ModeToggle />
-            <Drawer>
-              <DrawerTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Settings />
-                  <span className="sr-only">Settings</span>
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent className="max-h-[80vh]">
-                <ReportComponent onReportConfirmation={onReportConfirmation} />
-              </DrawerContent>
-            </Drawer>
+        <header className="sticky top-0 z-10 backdrop-blur-sm bg-background/80 border-b border-border/40 px-4">
+          <div className="container mx-auto flex h-16 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <span className="text-primary text-xl">🩺</span>
+              </div>
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/50 text-transparent bg-clip-text">
+                MediDrill
+              </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <ModeToggle />
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <Button variant="ghost" size="icon" className="md:hidden">
+                    <Settings />
+                    <span className="sr-only">Settings</span>
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent className="max-h-[80vh]">
+                  <ReportComponent onReportConfirmation={onReportConfirmation} />
+                </DrawerContent>
+              </Drawer>
+            </div>
           </div>
         </header>
-        <main className="grid flex-1 gap-4 overflow-auto p-4
-        md:grid-cols-2
-        lg:grid-cols-3"
-        >
-          <div
-            className="hidden md:flex flex-col"
-          >
-            <ReportComponent onReportConfirmation={onReportConfirmation} />
-            {/* <SideComponent onReportConfirmation={onReportConfirmation} /> */}
+        
+        <main className="container mx-auto flex-1 p-4 grid gap-6 md:grid-cols-[350px_1fr] lg:grid-cols-[400px_1fr] xl:gap-8">
+          <div className="hidden md:block">
+            <div className="sticky top-[5rem] space-y-4">
+              <ReportComponent onReportConfirmation={onReportConfirmation} />
+            </div>
           </div>
-          <div
-            className="lg:col-span-2"
-          >
+          <div className="min-h-[calc(100vh-10rem)] rounded-xl border bg-card p-4 shadow-sm">
             <ChatComponent reportData={reportData} />
           </div>
         </main>
